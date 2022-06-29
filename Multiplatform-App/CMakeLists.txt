@@ -32,53 +32,77 @@ set(CMAKE_AUTOUIC ON)
 message(STATUS "------- QT CONFIGURATION -------")
 
 if(LINUX)
-    set(Qt5Core_VERSION "5.15.2")
-    set(Qt5_DIR "~/Qt/${Qt5Core_VERSION}")
-    set(CMAKE_MODULE_PATH "${Qt5_DIR}")
-    set(CMAKE_PREFIX_PATH "${Qt5_DIR}/gcc_64/lib/cmake/Qt5")
-
-    message(STATUS "    CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
-    message(STATUS "    CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
-
+    set(QtCore_DIRECTORY "~/Qt")
+    set(QtCore_RELEASE "6") 
+    set(QtCore_VERSION "6.2.4")
+    set(QtCore_COMPILER_NAME "gcc_64")
 endif()
 
 if(WIN)
-    set(CMAKE_PREFIX_PATH "D:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5")
-    set(Qt5_DIR "D:/Qt/5.15.2/mingw81_64/bin")
-    set(Qt5Core_VERSION "5.15")
-    set(Qt5Qml_DIR "D:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml")
-    set(Qt5Network_DIR "D:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Network")
-    set(Qt5Core_DIR "D:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Core")
-    set(Qt5Quick_DIR "D:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Quick")
-    set(Qt5QmlModels_DIR "D:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5QmlModels")
-    set(Qt5Gui_DIR "D:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui")
-    set(Qt5Widgets_DIR "D:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Widgets")
-    set(Qt5Sql_DIR "D:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql")
-    set(Qt5NetworkAuth_DIR "D:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5NetworkAuth")    
+    set(QtCore_DIRECTORY "C:/Qt")
+    set(QtCore_RELEASE "6")
+    set(QtCore_VERSION "6.2.4")
+    set(QtCore_COMPILER_NAME "mingw_64")
 endif()
 
 if(ANDROID)
+    set(QtCore_RELEASE "6")
+    set(QtCore_VERSION "6.2.4")
+    set(QtCore_COMPILER_NAME "android")
     set(ANDROID_ABIS "armeabi-v7a")
     #set(ANDROID_ABIS "arm64-v8a")
     set(ANDROID_ARM_NEON "ON")
-    set(Qt5Core_VERSION "5.15")
-    set(CMAKE_MODULE_PATH "~/Qt/5.15.2")
-    set(CMAKE_PREFIX_PATH "~/Qt/5.15.2/android/lib/cmake/Qt5")
-    set(Qt5_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5")
-    set(Qt5Qml_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Qml")
-    set(Qt5Network_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Network")
-    set(Qt5Core_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Core")
-    set(Qt5Quick_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Quick")
-    set(Qt5QmlModels_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5QmlModels")
-    set(Qt5Gui_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Gui")
-    set(Qt5Widgets_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Widgets")
-    set(Qt5Sql_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Sql")
-    set(Qt5NetworkAuth_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5NetworkAuth")
 endif()
 
-find_package(Qt5 REQUIRED COMPONENTS Qml Quick Widgets)
+######################################################################### 
 
- message(STATUS "--------------------------------")
+######## BETWEEN THIS LINES (1/2) NO MODIFICATIONS SHOULD BE NECESSARY ##
+
+#########################################################################
+
+set(Qt_DIR_GLOBAL "${QtCore_DIRECTORY}/${QtCore_VERSION}")
+set(Qt_DIR_COMPILER "${Qt_DIR_GLOBAL}/${QtCore_COMPILER_NAME}")
+
+set(CMAKE_MODULE_PATH "${Qt_DIR_GLOBAL}")
+set(CMAKE_PREFIX_PATH "${Qt_DIR_COMPILER}")  
+
+######################################################################### 
+
+######## BETWEEN THIS LINES (2/2) NO MODIFICATIONS SHOULD BE NECESSARY ##
+
+#########################################################################
+
+message(STATUS "    QtCore_DIRECTORY  = ${QtCore_DIRECTORY}")
+message(STATUS "    QtCore_RELEASE = ${QtCore_RELEASE}")
+message(STATUS "    QtCore_VERSION = ${QtCore_VERSION}") 
+message(STATUS "    QtCore_COMPILER_NAME = ${QtCore_COMPILER_NAME}" )
+message(STATUS "    Qt_DIR_GLOBAL = ${Qt_DIR_GLOBAL}" )
+message(STATUS "    Qt_DIR_COMPILER = ${Qt_DIR_COMPILER}" )
+
+message(STATUS "")
+message(STATUS "")
+message(STATUS "------- WARNING !! -------")
+message(STATUS "------- IF NOT BUILD SUCCESFULLY MODIFY THIS VARIABLES IN CMAKELISTS -------")
+message(STATUS "")
+message(STATUS "    QtCore_DIRECTORY = ${QtCore_DIRECTORY}")
+message(STATUS "    QtCore_RELEASE = ${QtCore_RELEASE}")
+message(STATUS "    QtCore_VERSION = ${QtCore_VERSION}") 
+message(STATUS "    QtCore_COMPILER_NAME = ${QtCore_COMPILER_NAME}" )
+message(STATUS "    Qt_DIR_GLOBAL = ${Qt_DIR_GLOBAL}" )
+message(STATUS "    Qt_DIR_COMPILER = ${Qt_DIR_COMPILER}" )
+if(ANDROID)
+message(STATUS "    ANDROID_ABIS = ${ANDROID_ABIS}" )
+message(STATUS "    ANDROID_ARM_NEON = ${ANDROID_ARM_NEON}" )
+endif()
+message(STATUS "")
+message(STATUS "------- END WARNING !! -------")
+
+message(STATUS "")
+message(STATUS "")
+
+message(STATUS "--------------------------------")
+
+find_package(Qt${QtCore_RELEASE} REQUIRED COMPONENTS Qml Quick Widgets)
 
 if(LINUX)
 include_directories(${Qt5_DIR}/gcc_64/include/)
@@ -86,7 +110,7 @@ include_directories(${Qt5_DIR}/gcc_64/include/QtWidgets)
 include_directories(./)
 endif()
 
-qt5_add_resources(RESOURCES ./qml.qrc)
+qt6_add_resources(RESOURCES ./qml.qrc)
 
 if(ANDROID)
     add_library(Hello SHARED
@@ -99,14 +123,13 @@ add_executable(Hello
 endif()
 
 if(LINUX)
-    target_link_libraries(Hello Qt5::Quick Qt5::Qml Qt5::Widgets)
+    target_link_libraries(Hello Qt${QtCore_RELEASE}::Quick Qt${QtCore_RELEASE}::Qml Qt${QtCore_RELEASE}::Widgets)
 endif()
 
 if(ANDROID)
-    target_link_libraries(Hello Qt5::Quick Qt5::Qml Qt5::Widgets)
+    target_link_libraries(Hello Qt${QtCore_RELEASE}::Quick Qt${QtCore_RELEASE}::Qml Qt${QtCore_RELEASE}::Widgets)
 endif()
 
-
 if(WIN)
-target_link_libraries(Hello Qt5::Quick Qt5::Qml Qt5::Widgets)
+target_link_libraries(Hello Qt${QtCore_RELEASE}::Quick Qt${QtCore_RELEASE}::Qml Qt${QtCore_RELEASE}::Widgets)
 endif()
