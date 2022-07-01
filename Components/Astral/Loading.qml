@@ -10,9 +10,9 @@ Item
     property string colorPoint2_: "green"
     property string colorPoint3_: "yellow"
     property int space_: 5
-    property int pointSize: 15
-    width: pointSize * 3 + space_ * 2
-    height: pointSize
+    property int pointSize_: 15
+    width: pointSize_ * 3 + space_ * 2
+    height: pointSize_
 
     state: "default"
     states:[
@@ -84,8 +84,8 @@ Item
     Rectangle
     {
         id: p1
-        width: pointSize
-        height: pointSize
+        width: pointSize_
+        height: pointSize_
         radius: width / 2
         anchors.left: parent.left
         anchors.leftMargin: 0
@@ -97,7 +97,7 @@ Item
     Rectangle
     {
         id: p2
-        width: pointSize
+        width: pointSize_
         height: width
         radius: width / 2
         anchors.top: parent.top
@@ -110,7 +110,7 @@ Item
     Rectangle
     {
         id: p3
-        width: pointSize
+        width: pointSize_
         height: width
         radius: width / 2
         anchors.top: parent.top
@@ -135,5 +135,4 @@ Item
                 loading.state = "default"
         }
     }
-
 }
