@@ -1,0 +1,17 @@
+
+*.cmake
+*.bin
+*.o
+*.check_cache
+*.log
+Multiplatform-App/Couple/CMakeFiles
+*.make
+*.ninja*
+*.DS_Store
+Multiplatform-App/Couple/Couple_autogen
+CMakeCache.txt
+Multiplatform-App/Couple/Docker/data
+Multiplatform-App/Couple/Docker/etc
+qml.qrc.depends
+qrc_qml.cpp
+Makefile
