@@ -59,25 +59,19 @@ if(WIN)
 endif()
 
 if(MACOS)
-set(Qt_DIR "/Users/gadominguez/Qt")
-set(Qt_Version "6.5.0")
-set(CMAKE_PREFIX_PATH "${Qt_DIR}/${Qt_Version}/macos/lib/cmake/Qt6")
+set(CMAKE_PREFIX_PATH "$ENV{Qt_DIR}/$ENV{Qt_Version}/macos/lib/cmake/Qt6")
 endif()
 
 message(STATUS "    CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 
 if(ANDROID)
-    set(ANDROID_ABIS "armeabi-v7a")
-    #set(ANDROID_ABIS "arm64-v8a")
+    #set(ANDROID_ABIS "armeabi-v7a")
+    set(ANDROID_ABIS "arm64-v8a")
+    set(QT_ANDROID_ABIS ${ANDROID_ABIS})
     set(ANDROID_ARM_NEON "ON")
-    set(Qt5Core_VERSION "5.15")
-    set(CMAKE_MODULE_PATH "~/Qt/5.15.2")
-    set(CMAKE_PREFIX_PATH "~/Qt/5.15.2/android/lib/cmake/Qt5")
-    set(Qt5_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5")
-    set(Qt5Qml_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Qml")
-    set(Qt5Core_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Core")
-    set(Qt5Quick_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Quick")
-    set(Qt5Widgets_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Widgets")
+    set(CMAKE_PREFIX_PATH "$ENV{Qt_DIR}/$ENV{Qt_Version}/${ANDROID_ABIS}/lib/cmake/Qt6")
+    set(ANDROID_SDK_ROOT "$ENV{ANDROID_SDK_ROOT}/sdk")
+    set(ANDROID_NDK_ROOT "$ENV{ANDROID_NDK_ROOT}")
 endif()
 
 find_package(Qt6 REQUIRED COMPONENTS Qml Quick Widgets Sql)
@@ -91,8 +85,16 @@ include_directories(./)
 endif()
 
 if(MACOS)
-include_directories(${Qt_DIR}/${Qt_Version})
+include_directories($ENV{Qt_DIR}/$ENV{Qt_Version})
 set(MYSQL_CONNECTOR_CPP_DIR "/usr/local/mysql-cxx-arm")
+set(MYSQL_CONNECTOR_CPP_INCLUDE_DIR "${MYSQL_CONNECTOR_CPP_DIR}/include")
+set(MYSQL_CONNECTOR_CPP_LIB_DIR "${MYSQL_CONNECTOR_CPP_DIR}/lib64")
+include_directories(${MYSQL_CONNECTOR_CPP_INCLUDE_DIR})
+link_directories(${MYSQL_CONNECTOR_CPP_LIB_DIR})
+endif()
+
+if(ANDROID)
+set(MYSQL_CONNECTOR_CPP_DIR "/usr/local/mysql-cxx-arm64_v8a")
 set(MYSQL_CONNECTOR_CPP_INCLUDE_DIR "${MYSQL_CONNECTOR_CPP_DIR}/include")
 set(MYSQL_CONNECTOR_CPP_LIB_DIR "${MYSQL_CONNECTOR_CPP_DIR}/lib64")
 include_directories(${MYSQL_CONNECTOR_CPP_INCLUDE_DIR})
@@ -102,9 +104,11 @@ endif()
 qt6_add_resources(RESOURCES ./qml.qrc)
 
 if(ANDROID)
-    add_library(${PROJECT_NAME} SHARED
-            main.cpp
-            ${RESOURCES})
+    qt_add_executable(${PROJECT_NAME}  main.cpp ${RESOURCES})
+    #add_library(${PROJECT_NAME} SHARED
+    #        main.cpp
+    #        ${RESOURCES})
+    qt_finalize_executable(${PROJECT_NAME})
 else()
 add_executable(${PROJECT_NAME}
         main.cpp
@@ -112,18 +116,17 @@ add_executable(${PROJECT_NAME}
 endif()
 
 if(LINUX)
-    target_link_libraries(${PROJECT_NAME} Qt::Quick Qt::Qml Qt::Widgets)
+    target_link_libraries(${PROJECT_NAME} Qt::Quick Qt::Qml Qt::Widgets Qt::Sql mysqlcppconn mysqlcppconn8)
 endif()
 
 if(ANDROID)
-    target_link_libraries(${PROJECT_NAME} Qt::Quick Qt::Qml Qt::Widgets)
+    set_target_properties(${PROJECT_NAME}  PROPERTIES QT_ANDROID_ABIS ${ANDROID_ABIS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Quick Qt::Qml Qt::Widgets Qt::Sql mysqlcppconn mysqlcppconn8)
 endif()
-
 
 if(WIN)
-target_link_libraries(${PROJECT_NAME} Qt::Quick Qt::Qml Qt::Widgets)
+target_link_libraries(${PROJECT_NAME} Qt::Quick Qt::Qml Qt::Widgets Qt::Sql mysqlcppconn mysqlcppconn8)
 endif()
-
 
 if(MACOS)
 target_link_libraries(${PROJECT_NAME} Qt::Quick Qt::Qml Qt::Widgets Qt::Sql mysqlcppconn mysqlcppconn8)
