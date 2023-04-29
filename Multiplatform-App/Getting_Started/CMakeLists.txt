@@ -56,16 +56,13 @@ set(CMAKE_PREFIX_PATH "$ENV{Qt_DIR}/$ENV{Qt_Version}/macos/lib/cmake/Qt6")
 endif()
 
 if(ANDROID)
-    set(ANDROID_ABIS "armeabi-v7a")
-    #set(ANDROID_ABIS "arm64-v8a")
+    #set(ANDROID_ABIS "armeabi-v7a")
+    set(ANDROID_ABIS "arm64-v8a")
+    set(QT_ANDROID_ABIS ${ANDROID_ABIS})
     set(ANDROID_ARM_NEON "ON")
-    set(Qt5Core_VERSION "5.15")
-    set(CMAKE_MODULE_PATH "~/Qt/5.15.2")
-    set(CMAKE_PREFIX_PATH "~/Qt/5.15.2/android/lib/cmake/Qt5")
-    set(Qt5_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5")
-    set(Qt5Qml_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Qml")
-    set(Qt5Core_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Core")
-    set(Qt5Quick_DIR "~/Qt/5.15.2/android/lib/cmake/Qt5Quick")
+    set(CMAKE_PREFIX_PATH "$ENV{Qt_DIR}/$ENV{Qt_Version}/${ANDROID_ABIS}/lib/cmake/Qt6")
+    set(ANDROID_SDK_ROOT "$ENV{ANDROID_SDK_ROOT}/sdk")
+    set(ANDROID_NDK_ROOT "$ENV{ANDROID_NDK_ROOT}")
 endif()
 
 message(STATUS "    CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
@@ -79,9 +76,8 @@ include_directories($ENV{Qt_DIR}/$ENV{Qt_Version})
 qt6_add_resources(RESOURCES ./qml.qrc)
 
 if(ANDROID)
-    add_library(Hello SHARED
-            main.cpp
-            ${RESOURCES})
+qt_add_executable(${PROJECT_NAME}  main.cpp ${RESOURCES})
+qt_finalize_executable(${PROJECT_NAME})
 else()
 add_executable(Hello
         main.cpp
@@ -93,7 +89,8 @@ if(LINUX)
 endif()
 
 if(ANDROID)
-    target_link_libraries(${PROJECT_NAME} Qt::Quick Qt::Qml Qt::Widgets)
+    set_target_properties(${PROJECT_NAME}  PROPERTIES QT_ANDROID_ABIS ${ANDROID_ABIS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Quick Qt::Qml Qt::Widgets)
 endif()
 
 if(WIN)
@@ -103,5 +100,5 @@ endif()
 if(MACOS)
     target_link_libraries(${PROJECT_NAME} Qt::Quick Qt::Qml Qt::Widgets)
     set_target_properties(${PROJECT_NAME}  PROPERTIES
-                                MACOSX_BUNDLE FALSE)
+                MACOSX_BUNDLE FALSE)
 endif()
