@@ -15,3 +15,7 @@ Multiplatform-App/Couple/Docker/etc
 qml.qrc.depends
 qrc_qml.cpp
 Makefile
+**/database/data/*
+*_abi*
+*qt_internal*
+**/CMakeFiles*
